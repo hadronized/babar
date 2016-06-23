@@ -1,0 +1,149 @@
+#!/bin/sh
+
+# We need:
+#   + torrent?
+#   + sound
+#     - pulseaudio master volume
+#     - muted?
+#     - headphones?
+#   + disks, (used/total)
+#     - ~
+#     - /
+#   + CPU (all cores)
+#     - load
+#     - frequency
+#    + RAM
+#      - used/total
+#      - load
+#   + network
+#      - IP
+#      - DHCP?
+#      - ESSID (if wifi)
+#      - rate quality (if wifi)
+#   + power
+#      - battery remaining if present
+#   + date
+
+home_disk_mod() {
+  line=`df -h --output=used,size /dev/sdb1 | tail -n1`
+  used=`echo $line | cut -d' ' -f1`
+  total=`echo $line | cut -d' ' -f2`
+
+  echo '{ "full_text": "\u2302 '$used/$total'", "color": "#FB4934" },'
+}
+
+root_disk_mod() {
+  line=`df -h --output=used,size /dev/sda1 | tail -n1`
+  used=`echo $line | cut -d' ' -f1`
+  total=`echo $line | cut -d' ' -f2`
+
+  echo '{ "full_text": "/ '$used/$total'", "color": "#83A598" },'
+}
+
+ram_mod() {
+  ram_line=`free -m | tail -n2 | head -n1`
+  total=`echo $ram_line | cut -d' ' -f2`
+  used=`echo $ram_line | cut -d' ' -f3`
+  frac=$((total / 5))
+  black=`echo -ne "\u2B1B"`
+  white=`echo -ne "\u2B1C"`
+
+  if [[ $used -lt $frac ]]
+  then
+    echo '{ "full_text": "'$white$white$white$white $used/$total'", "color": "#83A598" },'
+  elif [[ $used -lt $((frac * 2)) ]]
+  then
+    echo '{ "full_text": "'$black$white$white$white $used/$total'", "color": "#B8BB26" },'
+  elif [[ $used -lt $((frac * 3)) ]]
+  then
+    echo '{ "full_text": "'$black$black$white$white $used/$total'", "color": "#FABD2F" },'
+  elif [[ $used -lt $((frac * 4)) ]]
+  then
+    echo '{ "full_text": "'$black$black$black$white $used/$total'", "color": "#FE8019" },'
+  else
+    echo '{ "full_text": "'$black$black$black$black $used/$total'", "color": "#FB4934" },'
+  fi
+}
+
+local_ip_mod() {
+  local_ip=`ip -o addr show | grep -v ": lo" | grep "inet " | cut -d' ' -f7  `
+
+  echo '{ "full_text": "'$local_ip'", "color": "#EBDBB2" },'
+}
+
+power_mod() {
+  sign=`echo -ne "\u26A1"`
+  adp=`cat /sys/class/power_supply/ADP1/online`
+  battery_present=`cat /sys/class/power_supply/BAT1/present`
+  capacity=`cat /sys/class/power_supply/BAT1/capacity`
+
+  if [ $adp == "0" ]
+  then
+    battery_mod $capacity
+  elif [ $battery_present == "1" ]
+  then
+    status=`cat /sys/class/power_supply/BAT1/status`
+    echo '{ "full_text": "'$sign $status $capacity'%", "color": "#B8BB26" },'
+  fi
+}
+
+battery_mod() {
+  capacity=$1
+  black=`echo -ne "\u2B1B"`
+  white=`echo -ne "\u2B1C"`
+
+  if [[ capacity -lt 8 ]]
+  then
+    color='#CC241D'
+    level=$white$white$white$white$white
+  elif [[ capacity -lt 20 ]]
+  then
+    color='#FB4934'
+    level=$black$white$white$white$white
+  elif [[ capacity -lt 40 ]]
+  then
+    color='#D65D0E'
+    level=$black$black$white$white$white
+  elif [[ capacity -lt 60 ]]
+  then
+    color='#FABD2F'
+    level=$black$black$black$white$white
+  elif [[ capacity -lt 80 ]]
+  then
+    color='#8EC07C'
+    level=$black$black$black$black$white
+  else
+    color='#B8BB26'
+    level=$black$black$black$black$black
+  fi
+
+  echo '{ "full_text": "'$level $capacity'%", "color": "'$color'" },'
+}
+
+date_mod() {
+  d=`date +'%a %b %d'`
+  echo '{ "full_text": "'$d'", "color": "#83A598" },'
+
+}
+
+time_mod () {
+  d=`date +'%H:%M:%S'`
+  echo '{ "full_text": "'$d'", "color": "#D3869B" }'
+}
+
+echo '{ "version": 1 }'
+echo '['
+
+while true; do
+  echo '['
+  home_disk_mod
+  root_disk_mod
+  ram_mod
+  local_ip_mod
+  power_mod
+  date_mod
+  time_mod
+  echo '],'
+
+  sleep 1
+done
