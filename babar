@@ -39,7 +39,7 @@ user_mod() {
 
 prog_mod() {
   prog=`ps ax --sort=-%cpu --format=cmd | head -n2 | tail -n1 | tr -s ' ' | cut -d' ' -f1`
-  echo '{ "full_text": "'$prog' ", "color": "#FE8019" },'
+  echo '{ "full_text": " '$prog' ", "color": "#FE8019" },'
 }
 
 amixer_mod() {
