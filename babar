@@ -37,6 +37,11 @@ user_mod() {
   echo '{ "full_text": "'$USER' ", "color": "#B16286" },'
 }
 
+prog_mod() {
+  prog=`ps ax --sort=-%cpu --format=cmd | head -n2 | tail -n1 | tr -s ' ' | cut -d' ' -f1`
+  echo '{ "full_text": "'$prog' ", "color": "#FE8019" },'
+}
+
 amixer_mod() {
   line=`amixer get Master | grep 'Front Left: Playback' | tr -s ' ' | tr -d '[]'`
   volume=`echo $line | cut -d' ' -f6`
@@ -162,13 +167,13 @@ while true; do
   a=(
     `echo '['
     user_mod
+    prog_mod
     amixer_mod
     disk_mod "\u2302" $home_disk "#FB4934"
     disk_mod "/" $root_disk "#83A598"
     ram_mod
     local_ip_mod
     power_mod
-    battery_mod 100
     date_mod
     time_mod
     echo '],'`
