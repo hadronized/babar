@@ -30,8 +30,8 @@ local white=`echo -ne "\u2B1C"`
 local power_sign=`echo -ne "\u26A1"`
 
 # system constants
-local home_disk=/dev/sda2
-local root_disk=/dev/sda2
+local home_disk=/dev/sda1
+local root_disk=/dev/sdb1
 
 user_mod() {
   echo '{ "full_text": "'$USER' ", "color": "#B16286" },'
@@ -80,7 +80,7 @@ root_disk_mod() {
 
 
 ram_mod() {
-  ram_line=`free -m | head -n3 | tail -n2`
+  ram_line=`free -m | head -n2 | tail -n1`
   total=`echo $ram_line | head -n1 | tr -s ' ' | cut -d' ' -f2`
   used=`echo $ram_line | tail -n1 | tr -s ' ' | cut -d' ' -f3`
   frac=$((total / 5))
@@ -162,7 +162,22 @@ date_mod() {
 
 time_mod () {
   d=`date +'%H:%M:%S'`
-  echo '{ "full_text": " \u231A '$d'", "color": "#D3869B" }'
+  minutes=`date +"%M"`
+
+  if [[ minutes -lt 15 ]]
+  then
+    sign="\u25F7"
+  elif [[ minutes -lt 30 ]]
+  then
+    sign="\u25F6"
+  elif [[ minutes -lt 45 ]]
+  then
+    sign="\u25F5"
+  else
+    sign="\u25F4"
+  fi
+
+  echo '{ "full_text": " '$sign $d'", "color": "#D3869B" }'
 }
 
 echo '{ "version": 1 }'
