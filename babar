@@ -42,6 +42,12 @@ prog_mod() {
   echo '{ "full_text": " '$prog' ", "color": "#FE8019" },'
 }
 
+brightness_mod() {
+  brightness=`xbacklight | xargs printf "%.0f"`
+
+  echo '{ "full_text": " \u2600 '$brightness'% ", "color": "#458588" },'
+}
+
 sound_mod() {
   volume=`pamixer --get-volume`
   muted=`pamixer --get-mute`
@@ -167,6 +173,7 @@ while true; do
     `echo '['
     user_mod
     prog_mod
+    brightness_mod
     sound_mod
     disk_mod "\u2302" $home_disk "#FB4934"
     disk_mod "/" $root_disk "#83A598"
