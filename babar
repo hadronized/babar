@@ -52,7 +52,7 @@ sound_mod() {
   volume=`pamixer --get-volume`
   muted=`pamixer --get-mute`
 
-  if [[ $muted == "true" ]]
+  if [[ $muted == "false" ]]
   then
     echo '{ "full_text": " \u266A '$volume' ", "color": "#B8BB26" },'
   else
