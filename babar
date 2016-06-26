@@ -42,12 +42,11 @@ prog_mod() {
   echo '{ "full_text": " '$prog' ", "color": "#FE8019" },'
 }
 
-amixer_mod() {
-  line=`amixer get Master | grep 'Front Left: Playback' | tr -s ' ' | tr -d '[]'`
-  volume=`echo $line | cut -d' ' -f6`
-  muted=`echo $line | cut -d' ' -f7`
+sound_mod() {
+  volume=`pamixer --get-volume`
+  muted=`pamixer --get-mute`
 
-  if [[ $muted == "on" ]]
+  if [[ $muted == "true" ]]
   then
     echo '{ "full_text": " \u266A '$volume' ", "color": "#B8BB26" },'
   else
@@ -108,13 +107,13 @@ power_mod() {
   battery_present=`cat /sys/class/power_supply/BAT1/present 2> /dev/null` || return
   capacity=`cat /sys/class/power_supply/BAT1/capacity 2> /dev/null` || return
 
-  if [ $adp == "0" ]
+  if [[ $adp == "0" ]]
   then
     battery_mod $capacity
-  elif [ $battery_present == "1" ]
+  elif [[ $battery_present == "1" ]]
   then
-    status=`cat /sys/class/power_supply/BAT1/status`
-    echo '{ "full_text": " '$power_sign $status $capacity'% ", "color": "#B8BB26" },'
+    s=`cat /sys/class/power_supply/BAT1/status`
+    echo '{ "full_text": " '$power_sign $s $capacity'% ", "color": "#B8BB26" },'
   fi
 }
 
@@ -168,7 +167,7 @@ while true; do
     `echo '['
     user_mod
     prog_mod
-    amixer_mod
+    sound_mod
     disk_mod "\u2302" $home_disk "#FB4934"
     disk_mod "/" $root_disk "#83A598"
     ram_mod
