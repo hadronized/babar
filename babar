@@ -27,7 +27,7 @@
 # unicode symbols
 local black='▰'
 local white='▱'
-local power_sign=`echo -ne "\u26A1"`
+local power_sign="\uf0e7"
 
 # system constants
 local home_disk=/dev/sda1
@@ -115,11 +115,6 @@ ram_mod() {
     echo '{ "full_text": " '$black$black$black$black$black$black$black$black$black$black $used/$total' ", "color": "#FB4934" },'
   fi
 }
-
-# #B8BB26
-# #FABD2F
-# #FE8019
-# #FB4934
 
 local_ip_mod() {
   local_ip=`ip -o addr show | grep -v ": lo" | grep "inet " | head -n1 | tr -s ' ' | cut -d' ' -f4`
