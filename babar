@@ -25,8 +25,8 @@
 #   + date
 
 # unicode symbols
-local black=`echo -ne "\u2B1B"`
-local white=`echo -ne "\u2B1C"`
+local black='▰'
+local white='▱'
 local power_sign=`echo -ne "\u26A1"`
 
 # system constants
@@ -83,24 +83,44 @@ ram_mod() {
   ram_line=`free -m | head -n2 | tail -n1`
   total=`echo $ram_line | head -n1 | tr -s ' ' | cut -d' ' -f2`
   used=`echo $ram_line | tail -n1 | tr -s ' ' | cut -d' ' -f3`
-  frac=$((total / 5))
+  frac=$((1.0 * used / total))
 
-  if [[ $used -lt $frac ]]
+  if (( $frac < 0.1 ))
   then
-    echo '{ "full_text": " '$white$white$white$white $used/$total' ", "color": "#83A598" },'
-  elif [[ $used -lt $((frac * 2)) ]]
+    echo '{ "full_text": " '$white$white$white$white$white$white$white$white$white$white $used/$total' ", "color": "#83A598" },'
+  elif (( $frac < 0.2 ))
   then
-    echo '{ "full_text": " '$black$white$white$white $used/$total' ", "color": "#B8BB26" },'
-  elif [[ $used -lt $((frac * 3)) ]]
+    echo '{ "full_text": " '$black$white$white$white$white$white$white$white$white$white $used/$total' ", "color": "#83A598" },'
+  elif (( $frac < 0.3 ))
   then
-    echo '{ "full_text": " '$black$black$white$white $used/$total' ", "color": "#FABD2F" },'
-  elif [[ $used -lt $((frac * 4)) ]]
+    echo '{ "full_text": " '$black$black$white$white$white$white$white$white$white$white $used/$total' ", "color": "#B8BB26" },'
+  elif (( $frac < 0.4 ))
   then
-    echo '{ "full_text": " '$black$black$black$white $used/$total' ", "color": "#FE8019" },'
+    echo '{ "full_text": " '$black$black$black$white$white$white$white$white$white$white $used/$total' ", "color": "#B8BB26" },'
+  elif (( $frac < 0.5 ))
+  then
+    echo '{ "full_text": " '$black$black$black$black$white$white$white$white$white$white $used/$total' ", "color": "#B8BB26" },'
+  elif (( $frac < 0.6 ))
+  then
+    echo '{ "full_text": " '$black$black$black$black$black$black$white$white$white$white $used/$total' ", "color": "#FABD2F" },'
+  elif (( $frac < 0.7 ))
+  then
+    echo '{ "full_text": " '$black$black$black$black$black$black$black$white$white$white $used/$total' ", "color": "#FABD2F" },'
+  elif (( $frac < 0.8 ))
+  then
+    echo '{ "full_text": " '$black$black$black$black$black$black$black$black$white$white $used/$total' ", "color": "#FE8019" },'
+  elif (( $frac < 0.9 ))
+  then
+    echo '{ "full_text": " '$black$black$black$black$black$black$black$black$black$white $used/$total' ", "color": "#FE8019" },'
   else
-    echo '{ "full_text": " '$black$black$black$black $used/$total' ", "color": "#FB4934" },'
+    echo '{ "full_text": " '$black$black$black$black$black$black$black$black$black$black $used/$total' ", "color": "#FB4934" },'
   fi
 }
+
+# #B8BB26
+# #FABD2F
+# #FE8019
+# #FB4934
 
 local_ip_mod() {
   local_ip=`ip -o addr show | grep -v ": lo" | grep "inet " | head -n1 | tr -s ' ' | cut -d' ' -f4`
@@ -188,8 +208,8 @@ while true; do
     `echo '['
     brightness_mod
     sound_mod
-    disk_mod "\u2302" $home_disk "#FB4934"
-    disk_mod "/" $root_disk "#83A598"
+    disk_mod "\uf015" $home_disk "#FB4934"
+    disk_mod "\uf06c" $root_disk "#83A598"
     ram_mod
     local_ip_mod
     power_mod
