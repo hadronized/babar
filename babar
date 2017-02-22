@@ -78,7 +78,6 @@ root_disk_mod() {
   echo '{ "full_text": " \u2302 '$used/$total' ", "color": "#83A598" },'
 }
 
-
 ram_mod() {
   ram_line=`free -m | head -n2 | tail -n1`
   total=`echo $ram_line | head -n1 | tr -s ' ' | cut -d' ' -f2`
