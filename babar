@@ -33,15 +33,6 @@ local power_sign=`echo -ne "\u26A1"`
 local home_disk=/dev/sda1
 local root_disk=/dev/sdb1
 
-user_mod() {
-  echo '{ "full_text": "'$USER' ", "color": "#B16286" },'
-}
-
-prog_mod() {
-  prog=`ps ax --sort=-%cpu --format=cmd | head -n2 | tail -n1 | tr -s ' ' | cut -d' ' -f1`
-  echo '{ "full_text": " '$prog' ", "color": "#FE8019" },'
-}
-
 brightness_mod() {
   brightness=`xbacklight | xargs printf "%.0f"`
 
@@ -52,12 +43,21 @@ sound_mod() {
   volume=`pamixer --get-volume`
   muted=`pamixer --get-mute`
 
-  if [[ $muted == "false" ]]
+  if [[ $muted == "true" ]]
   then
-    echo '{ "full_text": " \u266A '$volume' ", "color": "#B8BB26" },'
+    icon="\uf026"
+    echo '{ "full_text": " '$icon $volume' ", "color": "#7C6F64" },'
   else
-    echo '{ "full_text": " \u266A '$volume' ", "color": "#7C6F64" },'
+    if (( "$volume" <= "50" ))
+    then
+      icon="\uf027"
+    else
+      icon="\uf028"
+    fi
+
+    echo '{ "full_text": " '$icon $volume' ", "color": "#B8BB26" },'
   fi
+
 }
 
 disk_mod() {
@@ -186,8 +186,6 @@ echo '['
 while true; do
   a=(
     `echo '['
-    user_mod
-    prog_mod
     brightness_mod
     sound_mod
     disk_mod "\u2302" $home_disk "#FB4934"
