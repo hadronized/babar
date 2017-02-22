@@ -46,16 +46,19 @@ sound_mod() {
   if [[ $muted == "true" ]]
   then
     icon="\uf026"
-    echo '{ "full_text": " '$icon $volume' ", "color": "#7C6F64" },'
+    echo '{ "full_text": " '$icon' ", "color": "#7C6F64" },'
   else
-    if (( "$volume" <= "50" ))
+    if (( $volume <= 10 ))
+    then
+      icon="\uf026"
+    elif (( $volume <= 50 ))
     then
       icon="\uf027"
     else
       icon="\uf028"
     fi
 
-    echo '{ "full_text": " '$icon $volume' ", "color": "#B8BB26" },'
+    echo '{ "full_text": " '$icon $volume'% ", "color": "#B8BB26" },'
   fi
 
 }
@@ -133,7 +136,12 @@ power_mod() {
   elif [[ $battery_present == "1" ]]
   then
     s=`cat /sys/class/power_supply/BAT1/status`
-    echo '{ "full_text": " '$power_sign $s $capacity'% ", "color": "#B8BB26" },'
+    if [[ $capacity == "100" ]]
+    then
+      echo '{ "full_text": " \uf240 ", "color": "#83A598" },'
+    else
+      echo '{ "full_text": " '$power_sign $s $capacity'% ", "color": "#B8BB26" },'
+    fi
   fi
 }
 
@@ -143,34 +151,35 @@ battery_mod() {
   if [[ capacity -lt 8 ]]
   then
     color='#CC241D'
-    level=$white$white$white$white$white
-  elif [[ capacity -lt 20 ]]
+    level="\uf244"
+  elif [[ capacity -lt 25 ]]
   then
     color='#FB4934'
-    level=$black$white$white$white$white
-  elif [[ capacity -lt 40 ]]
-  then
-    color='#D65D0E'
-    level=$black$black$white$white$white
-  elif [[ capacity -lt 60 ]]
+    level="\uf243"
+  elif [[ capacity -lt 50 ]]
   then
     color='#FABD2F'
-    level=$black$black$black$white$white
-  elif [[ capacity -lt 80 ]]
+    level="\uf242"
+  elif [[ capacity -lt 75 ]]
   then
-    color='#8EC07C'
-    level=$black$black$black$black$white
-  else
+    color='#FABD2F'
     color='#B8BB26'
-    level=$black$black$black$black$black
+    level="\uf241"
+  #elif [[ capacity -lt 80 ]]
+  #then
+  #  color='#B8BB26'
+  #  level="\uf240"
+  else
+    color='#8EC07C'
+    level="\uf240"
   fi
 
-  echo '{ "full_text": " '$power_sign $level $capacity'% ", "color": "'$color'" },'
+  echo '{ "full_text": " '$level $capacity'% ", "color": "'$color'" },'
 }
 
 date_mod() {
   d=`date +'%a %b %d'`
-  echo '{ "full_text": " '$d' ", "color": "#83A598" },'
+  echo '{ "full_text": " \uf073 '$d' ", "color": "#CCCCCC" },'
 
 }
 
@@ -191,7 +200,7 @@ time_mod () {
     sign="\u25F4"
   fi
 
-  echo '{ "full_text": " '$sign $d'", "color": "#D3869B" }'
+  echo '{ "full_text": " '$sign $d'", "color": "#CCCCCC" }'
 }
 
 echo '{ "version": 1 }'
